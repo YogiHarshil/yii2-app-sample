@@ -1,0 +1,7 @@
+- name: Update & install common packages
+  apt:
+    name:
+      - git
+      - php
+      - unzip
+    update_cache: yes

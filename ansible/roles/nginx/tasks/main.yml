@@ -1,0 +1,21 @@
+- name: Install NGINX
+  apt:
+    name: nginx
+    state: present
+
+- name: Copy NGINX config
+  copy:
+    src: yii2
+    dest: /etc/nginx/sites-available/yii2
+
+- name: Enable site
+  file:
+    src: /etc/nginx/sites-available/yii2
+    dest: /etc/nginx/sites-enabled/yii2
+    state: link
+    force: yes
+
+- name: Restart NGINX
+  service:
+    name: nginx
+    state: restarted
