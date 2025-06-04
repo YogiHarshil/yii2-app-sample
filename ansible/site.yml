@@ -10,7 +10,6 @@
         - docker-compose
         - nginx
         - git
-
     - name: Enable Docker Swarm
       shell: docker swarm init || true
 
