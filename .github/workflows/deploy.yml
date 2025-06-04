@@ -1,5 +1,4 @@
 name: Deploy Yii2 App to EC2
-
 on:
   push:
     branches:
