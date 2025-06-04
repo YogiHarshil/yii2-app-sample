@@ -3,26 +3,30 @@
   tasks:
     - name: Install dependencies
       apt:
-        name: "{{ item }}"
+        name: ['docker.io', 'docker-compose', 'nginx', 'git']
         state: present
-      loop:
-        - docker.io
-        - docker-compose
-        - nginx
-        - git
+        update_cache: yes
+
     - name: Enable Docker Swarm
       shell: docker swarm init || true
 
-    - name: Configure NGINX
+    - name: Copy NGINX config
       copy:
         src: ../docker/nginx.conf
         dest: /etc/nginx/sites-available/yii2
+
     - name: Enable NGINX config
       file:
         src: /etc/nginx/sites-available/yii2
         dest: /etc/nginx/sites-enabled/yii2
         state: link
         force: yes
+
+    - name: Remove default NGINX config
+      file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+
     - name: Restart NGINX
       service:
         name: nginx
