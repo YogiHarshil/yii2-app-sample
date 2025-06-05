@@ -4,7 +4,7 @@ services:
   yii2-app:
     image: harshil15/yii2-app:latest
     ports:
-      - "9000:80"
+      - "80:80"
     deploy:
       replicas: 1
       restart_policy:
