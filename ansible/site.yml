@@ -2,32 +2,40 @@
   become: yes
   tasks:
     - name: Install dependencies
-      apt:
-        name: ['docker.io', 'docker-compose', 'nginx', 'git']
+      yum:
+        name:
+          - docker
+          - nginx
+          - git
         state: present
         update_cache: yes
+
+    - name: Enable and start Docker service
+      systemd:
+        name: docker
+        enabled: yes
+        state: started
 
     - name: Enable Docker Swarm
       shell: docker swarm init || true
 
+    - name: Create NGINX conf directory (if not exists)
+      file:
+        path: /etc/nginx/conf.d
+        state: directory
+
     - name: Copy NGINX config
       copy:
         src: ../docker/nginx.conf
-        dest: /etc/nginx/sites-available/yii2
+        dest: /etc/nginx/conf.d/yii2.conf
 
-    - name: Enable NGINX config
+    - name: Remove default NGINX welcome config
       file:
-        src: /etc/nginx/sites-available/yii2
-        dest: /etc/nginx/sites-enabled/yii2
-        state: link
-        force: yes
-
-    - name: Remove default NGINX config
-      file:
-        path: /etc/nginx/sites-enabled/default
+        path: /etc/nginx/conf.d/welcome.conf
         state: absent
 
-    - name: Restart NGINX
-      service:
+    - name: Enable and restart NGINX
+      systemd:
         name: nginx
+        enabled: yes
         state: restarted
