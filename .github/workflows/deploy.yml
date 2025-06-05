@@ -39,7 +39,7 @@ jobs:
         host: ${{ secrets.EC2_HOST }}
         username: ec2-user
         key: ${{ secrets.EC2_SSH_KEY }}
-        source: './docker-compose.yml'   # adjust path if needed
+        source: './docker-compose.yml'   # Adjust path if needed
         target: '/home/ec2-user/docker-compose.yml'
 
     - name: Deploy via SSH
@@ -49,5 +49,13 @@ jobs:
         username: ec2-user
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
-          docker pull ${{ secrets.DOCKER_USERNAME }}/yii2-app:latest
-          docker-compose -f /home/ec2-user/docker-compose.yml up -d
+          # Install docker-compose if not installed
+          if ! command -v docker-compose &> /dev/null; then
+            echo "Installing docker-compose..."
+            sudo curl -L "https://github.com/docker/compose/releases/download/v2.17.3/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+            sudo chmod +x /usr/local/bin/docker-compose
+          fi
+
+          # Pull latest image and deploy with docker-compose
+          /usr/bin/docker pull ${{ secrets.DOCKER_USERNAME }}/yii2-app:latest
+          /usr/local/bin/docker-compose -f /home/ec2-user/docker-compose.yml up -d
